@@ -16,9 +16,37 @@
       ];
 
       perSystem =
-        { pkgs, ... }:
+        { pkgs, system, ... }:
+        let
+          testVm = inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              inputs.self.nixosModules.default
+              (
+                { pkgs, ... }:
+                {
+                  boot.bootspec.enable = true;
+                  finix-specialisation.enable = true;
+                  finix-specialisation.modules = [ { nixpkgs.pkgs = pkgs; } ];
+
+                  users.users.root.password = "";
+
+                  boot.loader.grub.device = "nodev";
+                  fileSystems."/" = {
+                    device = "/dev/vda";
+                    fsType = "ext4";
+                  };
+
+                  system.stateVersion = "24.11";
+                }
+              )
+            ];
+          };
+        in
         {
           formatter = pkgs.nixfmt-tree;
+
+          packages.test-vm = testVm.config.system.build.vm;
 
           checks = {
             specialisation-exists = pkgs.callPackage ./tests/specialisation-exists.nix {
@@ -37,31 +65,6 @@
         nixosModules.default = {
           imports = [ ./module ];
           _module.args.finixSystem = inputs.finix-flake.lib.finixSystem;
-        };
-
-        nixosConfigurations.test-vm = inputs.nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            inputs.self.nixosModules.default
-            (
-              { pkgs, ... }:
-              {
-                boot.bootspec.enable = true;
-                finix-specialisation.enable = true;
-                finix-specialisation.modules = [ { nixpkgs.pkgs = pkgs; } ];
-
-                users.users.root.password = "";
-
-                boot.loader.grub.device = "nodev";
-                fileSystems."/" = {
-                  device = "/dev/vda";
-                  fsType = "ext4";
-                };
-
-                system.stateVersion = "24.11";
-              }
-            )
-          ];
         };
       };
     };

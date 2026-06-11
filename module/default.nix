@@ -46,6 +46,7 @@ in
     ];
 
     system.systemBuilderCommands = ''
+      mkdir -p $out/specialisation
       ln -s ${topLevel} $out/specialisation/${cfg.specialisationName}
     '';
   };
