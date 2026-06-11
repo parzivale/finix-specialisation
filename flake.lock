@@ -1,0 +1,43 @@
+{
+  "nodes": {
+    "finix-flake": {
+      "locked": {
+        "lastModified": 1780850396,
+        "narHash": "sha256-MB+57jxiEJItJxW0i4UpYQcso82lSO+6ZWu+Gbt0Zwc=",
+        "owner": "parzivale",
+        "repo": "finix",
+        "rev": "066a9825fde30eda2bdd3a5414af04c623d5a4e0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "parzivale",
+        "repo": "finix",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1780749050,
+        "narHash": "sha256-3av0pIjlOWQ6rDbNOmpUSvbNnJkGORQKKjb4LtCZsIY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "finix-flake": "finix-flake",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

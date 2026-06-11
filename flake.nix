@@ -1,11 +1,18 @@
 {
   description = "NixOS module for booting finix alongside NixOS";
 
-  outputs =
-    { self }:
-    let
-      sources = import ./lon.nix;
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    finix-flake.url = "github:parzivale/finix";
+  };
 
+  outputs =
+    {
+      self,
+      nixpkgs,
+      finix-flake,
+    }:
+    let
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -20,12 +27,14 @@
           }) systems
         );
 
-      pkgsFor = system: import sources.nixpkgs { inherit system; };
+      pkgsFor = system: import nixpkgs { inherit system; };
     in
     {
       formatter = forSystems (system: (pkgsFor system).nixfmt-tree);
 
-      nixosModules.default = ./module;
-      nixosModules.finix-entry = ./module;
+      nixosModules.default = {
+        imports = [ ./module ];
+        _module.args.finixSystem = finix-flake.lib.finixSystem;
+      };
     };
 }

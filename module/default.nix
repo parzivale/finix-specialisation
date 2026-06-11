@@ -1,24 +1,17 @@
 {
   config,
   lib,
+  finixSystem,
   ...
 }:
 let
   cfg = config.finix-specialisation;
-  finixSys = cfg.finixSystem { modules = cfg.modules; };
+  finixSys = finixSystem { modules = cfg.modules; };
   topLevel = finixSys.config.system.topLevel;
 in
 {
   options.finix-specialisation = {
     enable = lib.mkEnableOption "finix as a NixOS specialisation";
-
-    finixSystem = lib.mkOption {
-      type = lib.types.raw;
-      description = ''
-        The `lib.finixSystem` function from finix-flake.
-        Pass `inputs.finix-flake.lib.finixSystem`.
-      '';
-    };
 
     modules = lib.mkOption {
       type = lib.types.listOf lib.types.raw;
