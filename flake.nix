@@ -22,6 +22,7 @@
             inherit system;
             modules = [
               inputs.self.nixosModules.default
+              "${inputs.nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix"
               (
                 { pkgs, ... }:
                 {
@@ -31,7 +32,10 @@
 
                   users.users.root.password = "";
 
-                  boot.loader.grub.device = "nodev";
+                  boot.loader.systemd-boot.enable = true;
+                  boot.loader.efi.canTouchEfiVariables = true;
+                  virtualisation.useEFIBoot = true;
+
                   fileSystems."/" = {
                     device = "/dev/vda";
                     fsType = "ext4";
