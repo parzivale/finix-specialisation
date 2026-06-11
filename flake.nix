@@ -36,12 +36,7 @@
                   boot.loader.efi.canTouchEfiVariables = true;
                   boot.loader.timeout = 10;
                   virtualisation.useEFIBoot = true;
-                  virtualisation.directBoot.enable = false;
-
-                  fileSystems."/" = {
-                    device = "/dev/vda";
-                    fsType = "ext4";
-                  };
+                  virtualisation.useBootLoader = true;
 
                   system.stateVersion = "24.11";
                 }
