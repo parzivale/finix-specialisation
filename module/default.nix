@@ -45,8 +45,7 @@ in
       }
     ];
 
-    system.systemBuilderCommands = ''
-      mkdir -p $out/specialisation
+    system.systemBuilderCommands = lib.mkAfter ''
       ln -s ${topLevel} $out/specialisation/${cfg.specialisationName}
     '';
   };
