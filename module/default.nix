@@ -1,17 +1,16 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
-  cfg = config.finix-entry;
+  cfg = config.finix-specialisation;
   finixSys = cfg.finixSystem { modules = cfg.modules; };
   topLevel = finixSys.config.system.topLevel;
 in
 {
-  options.finix-entry = {
-    enable = lib.mkEnableOption "finix as a NixOS system profile";
+  options.finix-specialisation = {
+    enable = lib.mkEnableOption "finix as a NixOS specialisation";
 
     finixSystem = lib.mkOption {
       type = lib.types.raw;
@@ -24,15 +23,16 @@ in
     modules = lib.mkOption {
       type = lib.types.listOf lib.types.raw;
       default = [ ];
-      description = "Finix modules to build as the system profile.";
+      description = "Finix modules to build as the specialisation.";
     };
 
-    profileName = lib.mkOption {
+    specialisationName = lib.mkOption {
       type = lib.types.str;
       default = "finix";
       description = ''
-        Name of the profile under `/nix/var/nix/profiles/system-profiles/`.
-        This is what the bootloader uses as the entry label.
+        Name of the specialisation under the NixOS toplevel's
+        `specialisation/` directory. This is what the bootloader uses
+        as the entry label.
       '';
     };
   };
@@ -40,23 +40,17 @@ in
   config = lib.mkIf cfg.enable {
     assertions = [
       {
+        assertion = config.boot.bootspec.enable;
+        message = "finix-entry: the NixOS host must have boot.bootspec.enable = true";
+      }
+      {
         assertion = finixSys.config.boot.bootspec.enable;
         message = "finix-entry: the finix system must have boot.bootspec.enable = true";
       }
     ];
 
-    # Register the finix system as a NixOS system profile so that any
-    # NixOS bootloader (limine, grub, systemd-boot) discovers it via
-    # /nix/var/nix/profiles/system-profiles/ and generates a boot entry
-    # from the finix bootspec. Profiles in that directory are GC roots.
-    system.activationScripts.finix-entry = {
-      deps = [ "nix" ];
-      text = ''
-        mkdir -p /nix/var/nix/profiles/system-profiles
-        ${pkgs.nix}/bin/nix-env \
-          --profile /nix/var/nix/profiles/system-profiles/${cfg.profileName} \
-          --set ${topLevel}
-      '';
-    };
+    system.systemBuilderCommands = ''
+      ln -s ${topLevel} $out/specialisation/${cfg.specialisationName}
+    '';
   };
 }
