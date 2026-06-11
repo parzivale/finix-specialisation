@@ -41,11 +41,11 @@ in
     assertions = [
       {
         assertion = config.boot.bootspec.enable;
-        message = "finix-entry: the NixOS host must have boot.bootspec.enable = true";
+        message = "finix-specialisation: the NixOS host must have boot.bootspec.enable = true";
       }
       {
         assertion = finixSys.config.boot.bootspec.enable;
-        message = "finix-entry: the finix system must have boot.bootspec.enable = true";
+        message = "finix-specialisation: the finix system must have boot.bootspec.enable = true";
       }
     ];
 
