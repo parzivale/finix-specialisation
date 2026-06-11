@@ -36,6 +36,7 @@
                   boot.loader.efi.canTouchEfiVariables = true;
                   boot.loader.timeout = 10;
                   virtualisation.useEFIBoot = true;
+                  virtualisation.directBoot.enable = false;
 
                   fileSystems."/" = {
                     device = "/dev/vda";
