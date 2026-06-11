@@ -6,7 +6,10 @@
 }:
 let
   cfg = config.finix-specialisation;
-  finixSys = finixSystem { modules = cfg.modules; };
+  finixSys = finixSystem {
+    inherit lib;
+    modules = cfg.modules;
+  };
   topLevel = finixSys.config.system.topLevel;
 in
 {
