@@ -3,38 +3,27 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
     finix-flake.url = "github:parzivale/finix";
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      finix-flake,
-    }:
-    let
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
 
-      forSystems =
-        fn:
-        builtins.listToAttrs (
-          map (system: {
-            name = system;
-            value = fn system;
-          }) systems
-        );
+      perSystem = { pkgs, ... }: {
+        formatter = pkgs.nixfmt-tree;
+      };
 
-      pkgsFor = system: import nixpkgs { inherit system; };
-    in
-    {
-      formatter = forSystems (system: (pkgsFor system).nixfmt-tree);
-
-      nixosModules.default = {
-        imports = [ ./module ];
-        _module.args.finixSystem = finix-flake.lib.finixSystem;
+      flake = {
+        nixosModules.default = {
+          imports = [ ./module ];
+          _module.args.finixSystem = inputs.finix-flake.lib.finixSystem;
+        };
       };
     };
 }
