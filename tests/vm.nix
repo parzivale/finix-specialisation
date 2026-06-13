@@ -2,7 +2,6 @@
 # checks the specialisation symlink and bootspec are present at runtime.
 {
   pkgs,
-  nixpkgs,
   finixModule,
 }:
 pkgs.testers.nixosTest {

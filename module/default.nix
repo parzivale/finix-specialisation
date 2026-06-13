@@ -1,6 +1,8 @@
 {
   config,
   lib,
+  pkgs,
+  options,
   finixSystem,
   ...
 }:
@@ -8,9 +10,25 @@ let
   cfg = config.finix-specialisation;
   finixSys = finixSystem {
     inherit lib;
-    modules = cfg.modules;
+    inherit (cfg) modules;
   };
   topLevel = finixSys.config.system.topLevel;
+  jq = "${pkgs.buildPackages.jq}/bin/jq";
+  bootspecFilename = config.boot.bootspec.filename;
+
+  finixInjector = lib.escapeShellArgs [
+    jq
+    "--sort-keys"
+    "--slurpfile"
+    "finixBootspec"
+    "${topLevel}/boot.json"
+    ''."org.nixos.specialisation.v1"."${cfg.specialisationName}" = ($finixBootspec | first)''
+  ];
+
+  # Slip the finix injector into the existing pipeline before the stdio redirect.
+  finixWriter =
+    lib.removeSuffix " > $out/${bootspecFilename}" options.boot.bootspec.writer.default
+    + " | ${finixInjector} > $out/${bootspecFilename}";
 in
 {
   options.finix-specialisation = {
@@ -48,5 +66,7 @@ in
     system.systemBuilderCommands = lib.mkAfter ''
       ln -s ${topLevel} $out/specialisation/${cfg.specialisationName}
     '';
+
+    boot.bootspec.writer = finixWriter;
   };
 }

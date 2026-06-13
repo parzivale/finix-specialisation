@@ -24,19 +24,40 @@
               inputs.self.nixosModules.default
               "${inputs.nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix"
               (
-                { pkgs, ... }:
+                { pkgs, finixModules, ... }:
                 {
-                  boot.bootspec.enable = true;
+                  boot = {
+                    bootspec.enable = true;
+                    loader = {
+                      systemd-boot.enable = true;
+                      efi.canTouchEfiVariables = true;
+                      timeout = 10;
+                    };
+                  };
                   finix-specialisation.enable = true;
-                  finix-specialisation.modules = [ { nixpkgs.pkgs = pkgs; } ];
+                  finix-specialisation.modules = [
+                    "${inputs.finix-flake}/modules/virtualisation/qemu.nix"
+                    finixModules.getty
+                    finixModules.sysklogd
+                    { nixpkgs.pkgs = pkgs; }
+                    {
+                      boot.initrd.kernelModules = [ "virtio_gpu" ];
+                      services.sysklogd.enable = true;
+                      fileSystems."/" = {
+                        device = "tmpfs";
+                        fsType = "tmpfs";
+                        options = [ "mode=755" ];
+                      };
+                      users.users.root.password = "";
+                    }
+                  ];
 
                   users.users.root.password = "";
-
-                  boot.loader.systemd-boot.enable = true;
-                  boot.loader.efi.canTouchEfiVariables = true;
-                  boot.loader.timeout = 10;
-                  virtualisation.useEFIBoot = true;
-                  virtualisation.useBootLoader = true;
+                  virtualisation = {
+                    useEFIBoot = true;
+                    useBootLoader = true;
+                    mountHostNixStore = true;
+                  };
 
                   system.stateVersion = "24.11";
                 }
@@ -51,12 +72,12 @@
 
           checks = {
             specialisation-exists = pkgs.callPackage ./tests/specialisation-exists.nix {
-              nixpkgs = inputs.nixpkgs;
+              inherit (inputs) nixpkgs;
               finixModule = inputs.self.nixosModules.default;
             };
 
             vm = pkgs.callPackage ./tests/vm.nix {
-              nixpkgs = inputs.nixpkgs;
+              inherit (inputs) nixpkgs;
               finixModule = inputs.self.nixosModules.default;
             };
           };
@@ -66,6 +87,7 @@
         nixosModules.default = {
           imports = [ ./module ];
           _module.args.finixSystem = inputs.finix-flake.lib.finixSystem;
+          _module.args.finixModules = inputs.finix-flake.nixosModules;
         };
       };
     };
