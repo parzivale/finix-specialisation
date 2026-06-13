@@ -45,7 +45,7 @@ Then import it and configure it in your NixOS system:
 
 ### Requirements
 
-- systemd-boot as the bootloader
+- A bootloader that reads bootspec specialisations (systemd-boot, lanzaboote, etc.)
 - `finixModules` is available as a module arg (`inputs.finix-flake.nixosModules`)
 
 ## Development
