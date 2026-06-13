@@ -77,7 +77,6 @@
             };
 
             vm = pkgs.callPackage ./tests/vm.nix {
-              inherit (inputs) nixpkgs;
               finixModule = inputs.self.nixosModules.default;
             };
           };
