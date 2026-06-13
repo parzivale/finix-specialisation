@@ -12,7 +12,6 @@ pkgs.testers.nixosTest {
     {
       imports = [ finixModule ];
 
-      boot.bootspec.enable = true;
       finix-specialisation.enable = true;
       finix-specialisation.modules = [ { nixpkgs.pkgs = pkgs; } ];
 

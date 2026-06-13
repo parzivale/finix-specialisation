@@ -11,7 +11,6 @@ let
     modules = [
       finixModule
       {
-        boot.bootspec.enable = true;
         finix-specialisation.enable = true;
         finix-specialisation.modules = [ { nixpkgs.pkgs = pkgs; } ];
 

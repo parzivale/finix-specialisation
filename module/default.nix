@@ -52,17 +52,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = config.boot.bootspec.enable;
-        message = "finix-specialisation: the NixOS host must have boot.bootspec.enable = true";
-      }
-      {
-        assertion = finixSys.config.boot.bootspec.enable;
-        message = "finix-specialisation: the finix system must have boot.bootspec.enable = true";
-      }
-    ];
-
     system.systemBuilderCommands = lib.mkAfter ''
       ln -s ${topLevel} $out/specialisation/${cfg.specialisationName}
     '';
